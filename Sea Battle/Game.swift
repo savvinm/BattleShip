@@ -9,8 +9,6 @@ import Foundation
 
 struct Game{
     
-    static let letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]
-    
     private(set) var status: GameStatuses
     
     private(set) var playerCells: [Cell]
@@ -18,7 +16,7 @@ struct Game{
     private(set) var aiCells: [Cell]
     
     init(){
-        status = GameStatuses.start
+        status = GameStatuses.userMove
         playerCells = Game.generateEmptyMap()
         aiCells = Game.generateEmptyMap()
     }
@@ -26,19 +24,25 @@ struct Game{
     private static func generateEmptyMap() -> [Cell]{
         var cells = Array<Cell>()
         var id = 0
-        for letter in Game.letters {
-            for index in 0..<10{
-                cells.append(Cell(id: id, posLetter: letter, posNumber: index, status: CellStatuses.unknown))
+        for row in 0..<10 {
+            for col in 0..<10{
+                cells.append(Cell(id: id, x: col, y: row, status: CellStatuses.unknown))
                 id += 1
             }
         }
         return cells
     }
     
+    mutating func tapOn(_ id: Int){
+        if let index = playerCells.firstIndex(where: {$0.id == id}){
+            playerCells[index].status = CellStatuses.miss
+        }
+    }
+    
     struct Cell: Identifiable{
         let id: Int
-        let posLetter: String
-        let posNumber: Int
+        let x: Int
+        let y: Int
         var status: CellStatuses
     }
     
@@ -51,9 +55,9 @@ struct Game{
     }
     
     enum GameStatuses{
-        case start
+        case aiMove
         case lose
         case won
-        case action
+        case userMove
     }
 }

@@ -9,9 +9,9 @@ import SwiftUI
 
 @main
 struct Sea_BattleApp: App {
+    private let game = GameViewModel()
     var body: some Scene {
         WindowGroup {
-            let game = GameViewModel()
             ContentView(game: game)
         }
     }

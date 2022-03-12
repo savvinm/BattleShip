@@ -8,48 +8,55 @@
 import SwiftUI
 
 struct ContentView: View {
-    let game: GameViewModel
+    @ObservedObject var game: GameViewModel
     var body: some View {
-        ScrollView{
-            FieldView(dimension: 10, field: game.playerCells, coordLeters: game.coordLeters)
-                .onTapGesture{
-                    print(game.playersField)
-                }
-            /*LazyVGrid(columns: [GridItem(), GridItem(), GridItem(), GridItem(), GridItem()], spacing: 0){
-                ForEach(game.playerCells){cell in
-                    CellView(status: cell.status, content: cell.content)
-                        .aspectRatio(1, contentMode: .fit)
-                }
-            }
-            .foregroundColor(.blue)
-            .padding()*/
+        VStack{
+            FieldView(gameVM: game)
+                .foregroundColor(.blue)
+                .padding()
+            Spacer()
         }
     }
 }
 
 
 struct FieldView:View{
-    let dimension: Int
-    let field: Array<GameViewModel.FieldCell>
-    let coordLeters: Array<String>
-    let cellWidth = UIScreen.main.bounds.width / 13
+    @ObservedObject var gameVM: GameViewModel
+    let cellSize = UIScreen.main.bounds.width / 12
     var body: some View{
-        ForEach(field){cell in
-            ZStack{
-                Rectangle().strokeBorder(lineWidth: 3)
+        VStack(spacing: -35.0){
+            ForEach(0..<11){col in
+                HStack(spacing: 0.0){
+                    ForEach(0..<11){row in
+                        let cell = gameVM.playerMap[col*11 + row]
+                        CellView(cell: cell)
+                            .padding(.horizontal, -1.0)
+                            .frame(width: cellSize, height: cellSize)
+                            .onTapGesture{
+                                gameVM.tapOn(cell)
+                            }
+                    }
+                }
             }
+            .padding()
         }
+        .padding(.horizontal)
     }
 }
 
 struct CellView: View{
-    let status: Game.CellStatuses
-    let content: String
+    let cell: GameViewModel.FieldCell
     var body: some View{
-        let shape = RoundedRectangle(cornerRadius: 0)
+        let shape = Rectangle()
         ZStack{
-            shape
-            Text(content)
+            if cell.isGameField{
+                shape.foregroundColor(.white)
+                shape.strokeBorder(lineWidth: 2)
+                Text(cell.content)
+            }
+            else{
+                Text(cell.content)
+            }
         }
     }
 }

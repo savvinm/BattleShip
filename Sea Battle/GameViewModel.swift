@@ -7,8 +7,10 @@
 
 import Foundation
 
-class GameViewModel{
-    private(set) var game: Game
+class GameViewModel: ObservableObject{
+    let letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+    
+    @Published private(set) var game: Game
     
     //private(set) var field: Array<FieldCell>
     
@@ -16,47 +18,57 @@ class GameViewModel{
         game = Game()
     }
     
-    var playersField: Array<FieldCell>{
+    var playerMap: Array<FieldCell>{
         getField(gameCells: game.playerCells)
     }
     
     private func getField(gameCells: Array<Game.Cell>) -> Array<FieldCell>{
         var field = [FieldCell]()
         var id = 1
-        field.append(FieldCell(id: 0, content: "", ingameCellId: nil))
-        for letter in coordLeters{
-            field.append(FieldCell(id: id, content: letter, ingameCellId: nil))
+        field.append(FieldCell(id: 0, content: "", ingameCellId: nil, isGameField: false))
+        for letter in letters{
+            field.append(FieldCell(id: id, content: letter, ingameCellId: nil, isGameField: false))
             id += 1
         }
         var cellId = 0
-        for row in 0..<10{
-            for col in 0..<10{
-                if row == 0{
-                    field.append(FieldCell(id: id, content: String(col), ingameCellId: nil))
+        for col in 0..<10{
+            field.append(FieldCell(id: id, content: String(col), ingameCellId: nil, isGameField: false))
+            for _ in 0..<10{
+                var content = ""
+                switch gameCells[cellId].status{
+                case .unknown:
+                    content = ""
+                case .miss:
+                    content = "X"
+                case .shipHit:
+                    content = ""
+                case .shipKilled:
+                    content = ""
+                case .ship:
+                    content = ""
                 }
-                else{
-                    field.append(FieldCell(id: id, content: String(gameCells[cellId].id), ingameCellId: gameCells[cellId].id))
-                    cellId += 1
-                }
+                field.append(FieldCell(id: id, content: content, ingameCellId: gameCells[cellId].id, isGameField: true))
+                cellId += 1
                 id += 1
             }
         }
         return field
     }
     
-    var playerCells: Array<Game.Cell>{
-        game.playerCells
+    func tapOn(_ cell: FieldCell){
+        if game.status == Game.GameStatuses.userMove{
+            if cell.isGameField{
+                game.tapOn(cell.ingameCellId!)
+            }
+        }
     }
     
-    var coordLeters: Array<String>{
-        Game.letters
-    }
     
     struct FieldCell: Identifiable{
         let id: Int
         let content: String
         let ingameCellId: Int?
-        let isGameField = false
+        let isGameField: Bool
     }
 }
 
