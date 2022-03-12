@@ -1,6 +1,6 @@
 //
 //  GameViewModel.swift
-//  Sea Battle
+//  BattleShip
 //
 //  Created by Maksim Savvin on 10.03.2022.
 //
@@ -39,7 +39,7 @@ class GameViewModel: ObservableObject{
                 case .unknown:
                     content = ""
                 case .miss:
-                    content = "X"
+                    content = "."
                 case .shipHit:
                     content = ""
                 case .shipKilled:

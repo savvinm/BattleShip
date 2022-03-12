@@ -1,6 +1,6 @@
 //
 //  Game.swift
-//  Sea Battle
+//  BattleShip
 //
 //  Created by Maksim Savvin on 10.03.2022.
 //
