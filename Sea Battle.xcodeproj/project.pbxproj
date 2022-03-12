@@ -11,6 +11,8 @@
 		B5711C1627DA9CFC00ACD80A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5711C1527DA9CFC00ACD80A /* ContentView.swift */; };
 		B5711C1827DA9D0500ACD80A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5711C1727DA9D0500ACD80A /* Assets.xcassets */; };
 		B5711C1B27DA9D0500ACD80A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5711C1A27DA9D0500ACD80A /* Preview Assets.xcassets */; };
+		B5711C2227DA9D3800ACD80A /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5711C2127DA9D3800ACD80A /* Game.swift */; };
+		B5711C2427DAA48900ACD80A /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5711C2327DAA48900ACD80A /* GameViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,8 @@
 		B5711C1527DA9CFC00ACD80A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B5711C1727DA9D0500ACD80A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B5711C1A27DA9D0500ACD80A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		B5711C2127DA9D3800ACD80A /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		B5711C2327DAA48900ACD80A /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +59,8 @@
 				B5711C1527DA9CFC00ACD80A /* ContentView.swift */,
 				B5711C1727DA9D0500ACD80A /* Assets.xcassets */,
 				B5711C1927DA9D0500ACD80A /* Preview Content */,
+				B5711C2127DA9D3800ACD80A /* Game.swift */,
+				B5711C2327DAA48900ACD80A /* GameViewModel.swift */,
 			);
 			path = "Sea Battle";
 			sourceTree = "<group>";
@@ -137,7 +143,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5711C2427DAA48900ACD80A /* GameViewModel.swift in Sources */,
 				B5711C1627DA9CFC00ACD80A /* ContentView.swift in Sources */,
+				B5711C2227DA9D3800ACD80A /* Game.swift in Sources */,
 				B5711C1427DA9CFC00ACD80A /* Sea_BattleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

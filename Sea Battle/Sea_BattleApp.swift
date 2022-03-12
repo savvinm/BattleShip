@@ -11,7 +11,8 @@ import SwiftUI
 struct Sea_BattleApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            let game = GameViewModel()
+            ContentView(game: game)
         }
     }
 }
