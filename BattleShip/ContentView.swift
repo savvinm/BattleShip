@@ -24,23 +24,32 @@ struct FieldView:View{
     @ObservedObject var gameVM: GameViewModel
     let cellSize = UIScreen.main.bounds.width / 12
     var body: some View{
-        VStack(spacing: -35.0){
-            ForEach(0..<11){col in
-                HStack(spacing: 0.0){
-                    ForEach(0..<11){row in
-                        let cell = gameVM.playerMap[col*11 + row]
-                        CellView(cell: cell)
-                            .padding(.horizontal, -1.0)
-                            .frame(width: cellSize, height: cellSize)
-                            .onTapGesture{
-                                gameVM.tapOn(cell)
-                            }
+        let size = gameVM.interfaceSize
+        VStack{
+            VStack(spacing: -35.0){
+                ForEach(0..<size){col in
+                    HStack(spacing: 0.0){
+                        ForEach(0..<size){row in
+                            let cell = gameVM.playingMap[col*size + row]
+                            CellView(cell: cell)
+                                .padding(.horizontal, -1.0)
+                                .frame(width: cellSize, height: cellSize)
+                                .onTapGesture{
+                                    gameVM.tapOn(cell)
+                                }
+                        }
                     }
                 }
+                .padding()
             }
-            .padding()
+            .padding(.horizontal)
+            restartButton
         }
-        .padding(.horizontal)
+    }
+    private var restartButton: some View{
+        Button("Restart"){
+            gameVM.restart()
+        }
     }
 }
 

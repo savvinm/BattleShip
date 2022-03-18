@@ -8,21 +8,31 @@
 import Foundation
 
 class GameViewModel: ObservableObject{
-    let letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+    private let letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+    private let shipsLen = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
+    static private let mapSize = 10
+    
+    var interfaceSize: Int{
+        GameViewModel.mapSize + 1
+    }
     
     @Published private(set) var game: Game
     
-    //private(set) var field: Array<FieldCell>
     
     init(){
-        game = Game()
+        game = Game(size: GameViewModel.mapSize, ships: shipsLen)
+        //game.getShipsForAI()
     }
     
-    var playerMap: Array<FieldCell>{
-        getField(gameCells: game.playerCells)
+    func restart(){
+        game.restart(shipsLen: shipsLen.reversed())
     }
     
-    private func getField(gameCells: Array<Game.Cell>) -> Array<FieldCell>{
+    var playingMap: Array<FieldCell>{
+        getMap(gameCells: game.aiField)
+    }
+    
+    private func getMap(gameCells: Array<Game.Cell>) -> Array<FieldCell>{
         var field = [FieldCell]()
         var id = 1
         field.append(FieldCell(id: 0, content: "", ingameCellId: nil, isGameField: false))
@@ -31,9 +41,9 @@ class GameViewModel: ObservableObject{
             id += 1
         }
         var cellId = 0
-        for col in 0..<10{
+        for col in 0..<GameViewModel.mapSize{
             field.append(FieldCell(id: id, content: String(col), ingameCellId: nil, isGameField: false))
-            for _ in 0..<10{
+            for _ in 0..<GameViewModel.mapSize{
                 var content = ""
                 switch gameCells[cellId].status{
                 case .unknown:
@@ -45,7 +55,11 @@ class GameViewModel: ObservableObject{
                 case .shipKilled:
                     content = ""
                 case .ship:
+                    content = "⬛️"
+                case .empty:
                     content = ""
+                case .blocked:
+                    content = "X"
                 }
                 field.append(FieldCell(id: id, content: content, ingameCellId: gameCells[cellId].id, isGameField: true))
                 cellId += 1
