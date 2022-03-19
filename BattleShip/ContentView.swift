@@ -26,6 +26,7 @@ struct FieldView:View{
     var body: some View{
         let size = gameVM.interfaceSize
         VStack{
+            Text("Shots fired: \(gameVM.movesCount)")
             VStack(spacing: -35.0){
                 ForEach(0..<size){col in
                     HStack(spacing: 0.0){

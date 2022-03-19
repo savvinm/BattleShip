@@ -10,6 +10,7 @@ import Foundation
 struct Game{
     private let directions =  [(1,0), (-1,0), (0,1), (0,-1)]
     
+    private(set) var movesCount = 0
     
     private(set) var status: GameStatuses
     
@@ -20,6 +21,8 @@ struct Game{
     private var playerShipsCount: Int
     private var aiShipsCount: Int
     
+    private var aiShips: [Ship]
+    
     init(size: Int, ships: [Int]){
         status = GameStatuses.userMove
         self.size = size
@@ -27,6 +30,7 @@ struct Game{
         aiField = Game.getEmptyMap(size: size)
         playerShipsCount = ships.count
         aiShipsCount = ships.count
+        aiShips = [Ship]()
     }
     
     mutating func getShipsForAI(){
@@ -47,25 +51,66 @@ struct Game{
     
     mutating func restart(shipsLen: [Int]){
         aiField = Game.getEmptyMap(size: size)
+        aiShips = [Ship]()
+        movesCount = 0
         for len in shipsLen{
             putShipInRandomPlace(len: len)
         }
     }
     
+    /// Changes cell status to .shipHit and checks ship for destroy status
+    private mutating func hitShipIn(cell index: Int){
+        aiField[index].status = .shipHit
+        if !checkShipWith(cell: index){
+            destroyAndOutlineShipWith(cell: index)
+        }
+    }
     
+    /// Gets all cells of ship and changes their status and set to .empty cells around them
+    private mutating func destroyAndOutlineShipWith(cell index: Int){
+        let shipCells = aiShips.first(where: { $0.cellsIndexes.contains(index) })!.cellsIndexes
+        for index in shipCells{
+            destroyAndOutlineShipPartIn(x: aiField[index].x, y: aiField[index].y)
+        }
+    }
+    
+    /// This function changes cell status to .shipKilled and modify cells around it
+    private mutating func destroyAndOutlineShipPartIn(x xCord: Int, y yCord: Int){
+        for x in xCord - 1...xCord + 1{
+            for y in yCord - 1...yCord + 1{
+                if let index = cellIndexBy(x: x, y: y){
+                    if x == xCord && y == yCord{
+                        aiField[index].status = .shipKilled
+                    }
+                    if aiField[index].status != .shipKilled{
+                        aiField[index].status = .empty
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Returns false if all of it's cells have status .shipHit and true if even one cell have status .ship
+    private func checkShipWith(cell index: Int) -> Bool{
+        let shipCells = aiShips.first(where: { $0.cellsIndexes.contains(index) })!.cellsIndexes
+        for index in shipCells{
+            if aiField[index].status == .ship{
+                return true
+            }
+        }
+        return false
+    }
+
+    /// This function is used to put ship with length of len on field. It chooses a random free cell and tries to fit ship in one of four directions. If it fails, then it calls itself recurrently.
     private mutating func putShipInRandomPlace(len: Int){
         let startIndex = randomFreeCellIndex()
-        let shaffledDirections = directions.shuffled()
-        var res = false
-        for direction in shaffledDirections {
-            res = tryFitShip(len: len, startId: startIndex, xdif: direction.0, ydif: direction.1)
+        for direction in directions.shuffled() {
+            let res = tryFitShip(len: len, startIndex: startIndex, xdif: direction.0, ydif: direction.1)
             if res{
                 return
             }
         }
-        if !res{
-            putShipInRandomPlace(len: len)
-        }
+        putShipInRandomPlace(len: len)
     }
     
     private func cellIndexBy(x: Int, y: Int) -> Int?{
@@ -77,36 +122,36 @@ struct Game{
         }
     }
     
-    private mutating func tryFitShip(len: Int, startId: Int, xdif: Int, ydif: Int) -> Bool{
-        if let startIndex = cellIndexBy(startId){
-            var isFits = true
-            for step in 1..<len{
-                if let index = cellIndexBy(x: aiField[startIndex].x + step * xdif, y: aiField[startIndex].y + step * ydif){
-                    if aiField[index].status == .ship || aiField[index].status == .blocked{
-                        isFits = false
-                        break
-                    }
-                }
-                else {
+    /// Tries to fit ship with given length from start cell in direction of (x,y) vector. Returns true if ship was placed.
+    private mutating func tryFitShip(len: Int, startIndex: Int, xdif: Int, ydif: Int) -> Bool{
+        var isFits = true
+        for step in 1..<len{
+            if let index = cellIndexBy(x: aiField[startIndex].x + step * xdif, y: aiField[startIndex].y + step * ydif){
+            if aiField[index].status == .ship || aiField[index].status == .blocked{
                     isFits = false
                     break
                 }
             }
-            if isFits {
-                for step in 0..<len{
-                    putShipPartInCell(x: aiField[startIndex].x + step * xdif, y: aiField[startIndex].y + step * ydif)
-                }
-                return true
-            }
             else {
-                return false
+                isFits = false
+                break
             }
+        }
+        if isFits {
+            var cells = [Int]()
+            for step in 0..<len{
+                putShipPartInCell(x: aiField[startIndex].x + step * xdif, y: aiField[startIndex].y + step * ydif)
+                cells.append(cellIndexBy(x: aiField[startIndex].x + step * xdif, y: aiField[startIndex].y + step * ydif)!)
+            }
+            aiShips.append(Ship(id: aiShips.count, len: len, cellsIndexes: cells))
+            return true
         }
         else {
             return false
         }
     }
     
+    /// This function changes cell state to .ship and state of cells arround this cell to .blocked, so they cant be used for ship.
     private mutating func putShipPartInCell(x xCord: Int, y yCord: Int){
         for x in xCord - 1...xCord + 1{
             for y in yCord - 1...yCord + 1{
@@ -141,7 +186,14 @@ struct Game{
     
     mutating func tapOn(_ id: Int){
         if let index = aiField.firstIndex(where: {$0.id == id}){
-            aiField[index].status = .miss
+            if aiField[index].status == .unknown || aiField[index].status == .blocked{
+                aiField[index].status = .miss
+                movesCount += 1
+            }
+            if aiField[index].status == .ship{
+                hitShipIn(cell: index)
+                movesCount += 1
+            }
         }
     }
     
@@ -150,6 +202,12 @@ struct Game{
         let x: Int
         let y: Int
         var status: CellStatuses
+    }
+    
+    struct Ship: Identifiable{
+        let id: Int
+        let len: Int
+        let cellsIndexes: [Int]
     }
     
     enum CellStatuses{

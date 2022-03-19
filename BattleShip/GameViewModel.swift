@@ -32,6 +32,10 @@ class GameViewModel: ObservableObject{
         getMap(gameCells: game.aiField)
     }
     
+    var movesCount: Int{
+        game.movesCount
+    }
+    
     private func getMap(gameCells: Array<Game.Cell>) -> Array<FieldCell>{
         var field = [FieldCell]()
         var id = 1
@@ -49,17 +53,17 @@ class GameViewModel: ObservableObject{
                 case .unknown:
                     content = ""
                 case .miss:
-                    content = "."
+                    content = "❍"
                 case .shipHit:
-                    content = ""
+                    content = "🟧"
                 case .shipKilled:
-                    content = ""
+                    content = "🟥"
                 case .ship:
-                    content = "⬛️"
-                case .empty:
                     content = ""
-                case .blocked:
+                case .empty:
                     content = "X"
+                case .blocked:
+                    content = ""
                 }
                 field.append(FieldCell(id: id, content: content, ingameCellId: gameCells[cellId].id, isGameField: true))
                 cellId += 1
